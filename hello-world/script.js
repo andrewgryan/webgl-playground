@@ -11,12 +11,16 @@ const shaders = {}
 shaders.vertex = gl.createShader(gl.VERTEX_SHADER)
 gl.shaderSource(shaders.vertex, `
     attribute vec4 vertexPosition;
+    attribute vec4 vertexColor;
 
     uniform mat4 modelView;
     uniform mat4 projection;
 
+    varying lowp vec4 color;
+
     void main() {
         gl_Position = projection * modelView * vertexPosition;
+        color = vertexColor;
     }
 `)
 gl.compileShader(shaders.vertex)
@@ -24,8 +28,10 @@ gl.compileShader(shaders.vertex)
 // Fragment shader
 shaders.fragment = gl.createShader(gl.FRAGMENT_SHADER)
 gl.shaderSource(shaders.fragment, `
+    varying lowp vec4 color;
+
     void main() {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        gl_FragColor = color;
     }
 `)
 gl.compileShader(shaders.fragment)
@@ -35,11 +41,12 @@ const program = gl.createProgram()
 gl.attachShader(program, shaders.vertex)
 gl.attachShader(program, shaders.fragment)
 gl.linkProgram(program)
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+  alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(program));
+}
 
 // Buffers
 const buffers = {}
-buffers.position = gl.createBuffer()
-gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position)
 
 const positions = new Float32Array([
     -1.0,  1.0,
@@ -47,14 +54,27 @@ const positions = new Float32Array([
     -1.0, -1.0,
      1.0, -1.0,
 ])
+buffers.position = gl.createBuffer()
+gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position)
 gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
 
-// TODO finish tutorial
+
+const colors = new Float32Array([
+    1.0, 1.0, 1.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 0.0, 1.0, 1.0,
+])
+buffers.colors = gl.createBuffer()
+gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors)
+gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+
 
 // Locations
 const locations = {
     attributes: {
-        vertexPosition: gl.getAttribLocation(program, "vertexPosition")
+        vertexPosition: gl.getAttribLocation(program, "vertexPosition"),
+        vertexColor: gl.getAttribLocation(program, "vertexColor")
     },
     uniforms: {
         projection: gl.getUniformLocation(program, "projection"),
@@ -82,13 +102,19 @@ mat4.translate(modelView, modelView, [-0.0, 0.0, -6.0])
 console.log(modelView)
 
 // Bind attribute buffer to data
-const numComponents = 2
 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position)
 gl.vertexAttribPointer(
-    locations.attributes.vertexPosition,
-    numComponents, gl.FLOAT, false, 0, 0)
+    locations.attributes.vertexPosition, 2, gl.FLOAT, false, 0, 0)
 gl.enableVertexAttribArray(
     locations.attributes.vertexPosition
+)
+
+// Bind color array buffer
+gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors)
+gl.vertexAttribPointer(
+    locations.attributes.vertexColor, 4, gl.FLOAT, false, 0, 0)
+gl.enableVertexAttribArray(
+    locations.attributes.vertexColor
 )
 
 gl.useProgram(program)
