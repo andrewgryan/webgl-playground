@@ -36,6 +36,8 @@ const positions = new Float32Array([
      1.0,  1.0,
     -1.0, -1.0,
      1.0, -1.0,
+    -1.0, -2.0,
+     1.0, -2.0,
 ])
 buffers.position = gl.createBuffer()
 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position)
@@ -47,6 +49,8 @@ const colors = new Float32Array([
     1.0, 0.0, 0.0, 1.0,
     0.0, 1.0, 0.0, 1.0,
     0.0, 0.0, 1.0, 1.0,
+    1.0, 0.0, 1.0, 1.0,
+    0.0, 1.0, 1.0, 1.0,
 ])
 buffers.colors = gl.createBuffer()
 gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors)
@@ -113,5 +117,5 @@ gl.uniformMatrix4fv(
     modelView
 )
 const offset = 0
-const vertexCount = 4
+const vertexCount = positions.length / 2
 gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount)

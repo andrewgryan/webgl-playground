@@ -4,7 +4,7 @@ attribute vec4 vertexColor;
 uniform mat4 modelView;
 uniform mat4 projection;
 
-varying lowp vec4 color;
+varying highp vec4 color;
 
 void main() {
     gl_Position = projection * modelView * vertexPosition;
