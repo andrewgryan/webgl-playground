@@ -1,4 +1,6 @@
 import * as mat4 from "gl-mat4"
+import fragmentSource from "./shaders/fragment.glsl"
+import vertexSource from "./shaders/vertex.glsl"
 
 let el = document.getElementById("root")
 
@@ -9,31 +11,12 @@ const shaders = {}
 
 // Vertex shader
 shaders.vertex = gl.createShader(gl.VERTEX_SHADER)
-gl.shaderSource(shaders.vertex, `
-    attribute vec4 vertexPosition;
-    attribute vec4 vertexColor;
-
-    uniform mat4 modelView;
-    uniform mat4 projection;
-
-    varying lowp vec4 color;
-
-    void main() {
-        gl_Position = projection * modelView * vertexPosition;
-        color = vertexColor;
-    }
-`)
+gl.shaderSource(shaders.vertex, vertexSource)
 gl.compileShader(shaders.vertex)
 
 // Fragment shader
 shaders.fragment = gl.createShader(gl.FRAGMENT_SHADER)
-gl.shaderSource(shaders.fragment, `
-    varying lowp vec4 color;
-
-    void main() {
-        gl_FragColor = color;
-    }
-`)
+gl.shaderSource(shaders.fragment, fragmentSource)
 gl.compileShader(shaders.fragment)
 
 // Shader program
